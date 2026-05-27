@@ -38,16 +38,20 @@ export function RegionSelector({ active, onSelect, onCancel }) {
     const dx = Math.abs(end.x - start.x);
     const dy = Math.abs(end.y - start.y);
 
-    // Store viewport dimensions for resize scaling
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
+    // Store position as percentage of document dimensions for resize compatibility
     const documentWidth = document.documentElement.scrollWidth;
+    const documentHeight = document.documentElement.scrollHeight;
 
     if (dx < 5 && dy < 5) {
       onSelect({
         type: 'point',
-        position: { x: start.x, y: start.y },
-        viewport: { width: viewportWidth, height: viewportHeight, documentWidth },
+        position: {
+          x: start.x,
+          y: start.y,
+          xPercent: (start.x / documentWidth) * 100,
+          yPercent: (start.y / documentHeight) * 100
+        },
+        viewport: { width: documentWidth, height: documentHeight },
         region: null
       });
     } else {
@@ -55,9 +59,18 @@ export function RegionSelector({ active, onSelect, onCancel }) {
       const y = Math.min(start.y, end.y);
       onSelect({
         type: 'region',
-        position: { x, y },
-        viewport: { width: viewportWidth, height: viewportHeight, documentWidth },
-        region: { x, y, width: dx, height: dy }
+        position: {
+          x,
+          y,
+          xPercent: (x / documentWidth) * 100,
+          yPercent: (y / documentHeight) * 100
+        },
+        viewport: { width: documentWidth, height: documentHeight },
+        region: {
+          x, y, width: dx, height: dy,
+          widthPercent: (dx / documentWidth) * 100,
+          heightPercent: (dy / documentHeight) * 100
+        }
       });
     }
 

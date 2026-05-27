@@ -10,34 +10,35 @@ export function CommentPin({ comment, number, isSelected, onClick }) {
 
   useEffect(() => {
     const updatePosition = () => {
-      if (!comment.viewport) {
-        // Legacy comment without viewport data - use original position
+      if (!comment.position.xPercent || !comment.position.yPercent) {
+        // Legacy comment without percentage data - use original pixel position
         setPosition(comment.position);
         setRegionDimensions(comment.region);
         return;
       }
 
-      // Calculate scale factor based on document width change
-      const currentDocumentWidth = document.documentElement.scrollWidth;
-      const originalDocumentWidth = comment.viewport.documentWidth || comment.viewport.width;
-      const scale = currentDocumentWidth / originalDocumentWidth;
+      // Calculate position from percentages based on current document size
+      const currentDocWidth = document.documentElement.scrollWidth;
+      const currentDocHeight = document.documentElement.scrollHeight;
 
-      // Scale the position
       const scaledPosition = {
-        x: comment.position.x * scale,
-        y: comment.position.y * scale
+        x: (comment.position.xPercent / 100) * currentDocWidth,
+        y: (comment.position.yPercent / 100) * currentDocHeight
       };
 
       setPosition(scaledPosition);
 
-      // Scale region if it exists
-      if (comment.region) {
+      // Scale region using percentages
+      if (comment.region && comment.region.widthPercent && comment.region.heightPercent) {
         setRegionDimensions({
-          x: comment.region.x * scale,
-          y: comment.region.y * scale,
-          width: comment.region.width * scale,
-          height: comment.region.height * scale
+          x: (comment.position.xPercent / 100) * currentDocWidth,
+          y: (comment.position.yPercent / 100) * currentDocHeight,
+          width: (comment.region.widthPercent / 100) * currentDocWidth,
+          height: (comment.region.heightPercent / 100) * currentDocHeight
         });
+      } else if (comment.region) {
+        // Legacy region without percentages
+        setRegionDimensions(comment.region);
       }
     };
 
