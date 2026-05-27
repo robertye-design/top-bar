@@ -14,18 +14,37 @@ export function createCommentRoutes(storage) {
 
   router.post('/prototypes/:prototypeId/comments', (req, res) => {
     try {
-      const { type, position, viewport, region, authorName, text } = req.body;
+      const {
+        type,
+        componentId,
+        componentLabel,
+        isSelector,
+        position,
+        viewport,
+        region,
+        authorName,
+        text
+      } = req.body;
 
       if (!type || !position || !authorName || !text) {
         return res.status(400).json({ error: 'Missing required fields: type, position, authorName, text' });
       }
 
-      if (type === 'region' && !region) {
-        return res.status(400).json({ error: 'Region data required when type is "region"' });
+      // V1.1: Component type should have componentId
+      if (type === 'component' && !componentId) {
+        return res.status(400).json({ error: 'componentId required when type is "component"' });
       }
 
       const comment = storage.addComment(req.params.prototypeId, {
-        type, position, viewport, region, authorName, text
+        type,
+        componentId,
+        componentLabel,
+        isSelector,
+        position,
+        viewport,
+        region,
+        authorName,
+        text
       });
       res.status(201).json(comment);
     } catch (err) {

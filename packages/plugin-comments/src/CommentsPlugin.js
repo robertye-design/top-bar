@@ -87,6 +87,9 @@ export class CommentsPlugin {
     try {
       const data = {
         type: this.newCommentPosition.type,
+        componentId: this.newCommentPosition.componentId,
+        componentLabel: this.newCommentPosition.componentLabel,
+        isSelector: this.newCommentPosition.isSelector,
         position: this.newCommentPosition.position,
         viewport: this.newCommentPosition.viewport,
         region: this.newCommentPosition.region,

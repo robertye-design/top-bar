@@ -55,6 +55,9 @@ export class JsonStorage {
     const comment = {
       id: randomUUID(),
       type: data.type,
+      componentId: data.componentId || null,
+      componentLabel: data.componentLabel || null,
+      isSelector: data.isSelector || false,
       position: data.position,
       viewport: data.viewport || null,
       region: data.region || null,

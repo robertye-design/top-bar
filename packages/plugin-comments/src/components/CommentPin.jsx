@@ -2,49 +2,80 @@ import { h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 
 export function CommentPin({ comment, number, isSelected, onClick }) {
-  const hasRegion = comment.type === 'region' && comment.region;
-
-  // Calculate scaled position based on viewport changes
+  const hasRegion = comment.region;
   const [position, setPosition] = useState(comment.position);
   const [regionDimensions, setRegionDimensions] = useState(comment.region);
 
   useEffect(() => {
     const updatePosition = () => {
-      if (!comment.position.xPercent) {
-        // Legacy comment without percentage data - use original pixel position
-        setPosition(comment.position);
-        setRegionDimensions(comment.region);
+      // V1.1: Component-based positioning
+      if (comment.componentId && comment.type === 'component') {
+        // Find element by componentId or CSS selector
+        const selector = comment.isSelector
+          ? comment.componentId
+          : `[data-comment-id="${comment.componentId}"]`;
+
+        const element = document.querySelector(selector);
+
+        if (element) {
+          // Use getBoundingClientRect for perfect positioning
+          const rect = element.getBoundingClientRect();
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+          setPosition({
+            x: rect.left + scrollLeft + (rect.width / 2),  // Center of element
+            y: rect.top + scrollTop + 10  // Slightly below top
+          });
+
+          // Update region to match element bounds
+          if (comment.region) {
+            setRegionDimensions({
+              x: rect.left + scrollLeft,
+              y: rect.top + scrollTop,
+              width: rect.width,
+              height: rect.height
+            });
+          }
+          return;
+        }
+        // Element not found - fall through to legacy positioning
+      }
+
+      // Legacy positioning (V1.0 - percentage based)
+      if (comment.position.xPercent) {
+        const currentDocWidth = document.documentElement.scrollWidth;
+        const scaledPosition = {
+          x: (comment.position.xPercent / 100) * currentDocWidth,
+          y: comment.position.y
+        };
+        setPosition(scaledPosition);
+
+        if (comment.region && comment.region.widthPercent) {
+          setRegionDimensions({
+            x: (comment.position.xPercent / 100) * currentDocWidth,
+            y: comment.position.y,
+            width: (comment.region.widthPercent / 100) * currentDocWidth,
+            height: comment.region.height
+          });
+        } else if (comment.region) {
+          setRegionDimensions(comment.region);
+        }
         return;
       }
 
-      // Calculate X position from percentage based on current document width
-      // Keep Y position absolute (document height doesn't scale with viewport)
-      const currentDocWidth = document.documentElement.scrollWidth;
-
-      const scaledPosition = {
-        x: (comment.position.xPercent / 100) * currentDocWidth,
-        y: comment.position.y  // Keep Y absolute - vertical content doesn't scale
-      };
-
-      setPosition(scaledPosition);
-
-      // Scale region width only, keep height and Y absolute
-      if (comment.region && comment.region.widthPercent) {
-        setRegionDimensions({
-          x: (comment.position.xPercent / 100) * currentDocWidth,
-          y: comment.position.y,  // Keep Y absolute
-          width: (comment.region.widthPercent / 100) * currentDocWidth,
-          height: comment.region.height  // Keep height absolute
-        });
-      } else if (comment.region) {
-        // Legacy region without percentages
-        setRegionDimensions(comment.region);
-      }
+      // Fallback: Use stored pixel position
+      setPosition(comment.position);
+      setRegionDimensions(comment.region);
     };
 
     updatePosition();
     window.addEventListener('resize', updatePosition);
-    return () => window.removeEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition);
+    return () => {
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition);
+    };
   }, [comment]);
 
   return (

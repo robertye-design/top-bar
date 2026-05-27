@@ -30,6 +30,54 @@ export function RegionSelector({ active, onSelect, onCancel }) {
     setCurrent({ x: e.pageX, y: e.pageY });
   };
 
+  // Helper: Find nearest element with data-comment-id
+  const findComponentId = (clickEvent) => {
+    let element = clickEvent.target;
+
+    // Traverse up to find [data-comment-id]
+    while (element && element !== document.body) {
+      const commentId = element.getAttribute('data-comment-id');
+      if (commentId) {
+        // Generate human-readable label from ID
+        const label = commentId
+          .split('-')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+        return { componentId: commentId, componentLabel: label };
+      }
+      element = element.parentElement;
+    }
+
+    // Fallback: Generate CSS selector path
+    const generateSelector = (el) => {
+      if (!el || el === document.body) return null;
+
+      const parts = [];
+      while (el && el !== document.body) {
+        let selector = el.tagName.toLowerCase();
+        if (el.id) {
+          selector += `#${el.id}`;
+          parts.unshift(selector);
+          break;
+        }
+        if (el.className) {
+          const classes = Array.from(el.classList).join('.');
+          if (classes) selector += `.${classes}`;
+        }
+        parts.unshift(selector);
+        el = el.parentElement;
+      }
+      return parts.join(' > ');
+    };
+
+    const selector = generateSelector(clickEvent.target);
+    return {
+      componentId: selector,
+      componentLabel: 'Element',
+      isSelector: true
+    };
+  };
+
   const handleMouseUp = (e) => {
     if (!dragging || !start) return;
     setDragging(false);
@@ -38,18 +86,23 @@ export function RegionSelector({ active, onSelect, onCancel }) {
     const dx = Math.abs(end.x - start.x);
     const dy = Math.abs(end.y - start.y);
 
+    // Detect component ID
+    const component = findComponentId(e);
+
     // Store position as percentage of document dimensions for resize compatibility
     const documentWidth = document.documentElement.scrollWidth;
     const documentHeight = document.documentElement.scrollHeight;
 
     if (dx < 5 && dy < 5) {
       onSelect({
-        type: 'point',
+        type: 'component',
+        componentId: component.componentId,
+        componentLabel: component.componentLabel,
+        isSelector: component.isSelector || false,
         position: {
           x: start.x,
           y: start.y,
-          xPercent: (start.x / documentWidth) * 100,
-          yPercent: (start.y / documentHeight) * 100
+          xPercent: (start.x / documentWidth) * 100
         },
         viewport: { width: documentWidth, height: documentHeight },
         region: null
@@ -58,18 +111,19 @@ export function RegionSelector({ active, onSelect, onCancel }) {
       const x = Math.min(start.x, end.x);
       const y = Math.min(start.y, end.y);
       onSelect({
-        type: 'region',
+        type: 'component',
+        componentId: component.componentId,
+        componentLabel: component.componentLabel,
+        isSelector: component.isSelector || false,
         position: {
           x,
           y,
-          xPercent: (x / documentWidth) * 100,
-          yPercent: (y / documentHeight) * 100
+          xPercent: (x / documentWidth) * 100
         },
         viewport: { width: documentWidth, height: documentHeight },
         region: {
           x, y, width: dx, height: dy,
-          widthPercent: (dx / documentWidth) * 100,
-          heightPercent: (dy / documentHeight) * 100
+          widthPercent: (dx / documentWidth) * 100
         }
       });
     }
