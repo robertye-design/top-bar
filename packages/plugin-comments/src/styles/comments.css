@@ -1,0 +1,534 @@
+/**
+ * Prototype Framework - Comments Plugin Styles
+ * All classes are prefixed with .pf-* to avoid conflicts with prototype pages
+ */
+
+/* ===== Z-INDEX HIERARCHY ===== */
+/* Top bar: 99998 */
+/* Sidebar: 99997 */
+/* Pins: 99996 */
+/* Region selector: 99995 */
+
+/* ===== FONTS ===== */
+:root {
+  --pf-font-sans: Geist, Inter, system-ui, -apple-system, sans-serif;
+  --pf-font-mono: Geist Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+  --pf-color-dark: #171717;
+  --pf-color-white: #ffffff;
+  --pf-color-border: #ebebeb;
+  --pf-color-text-primary: #171717;
+  --pf-color-text-secondary: #4d4d4d;
+  --pf-color-text-muted: #888888;
+  --pf-color-danger: #ee0000;
+  --pf-color-bg-subtle: #fafafa;
+}
+
+/* ===== TOP BAR UI ===== */
+.pf-comment-topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pf-comment-topbar span {
+  font-size: 12px;
+  color: var(--pf-color-text-muted);
+  font-family: var(--pf-font-mono);
+  line-height: 16px;
+}
+
+.pf-comment-topbar button {
+  padding: 0 8px;
+  height: 28px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.28px;
+  cursor: pointer;
+  font-family: var(--pf-font-sans);
+  transition: all 0.15s ease;
+  line-height: 20px;
+}
+
+.pf-comment-topbar button:not([aria-label*="Cancel"]) {
+  border: none;
+  background: var(--pf-color-dark);
+  color: var(--pf-color-white);
+}
+
+.pf-comment-topbar button[aria-label*="Cancel"] {
+  border: 1px solid var(--pf-color-border);
+  background: var(--pf-color-white);
+  color: var(--pf-color-dark);
+}
+
+.pf-comment-topbar button:hover {
+  opacity: 0.9;
+}
+
+/* ===== COMMENT PINS ===== */
+.pf-pin {
+  position: absolute;
+  pointer-events: auto;
+  z-index: 99996;
+  cursor: pointer;
+}
+
+.pf-pin > div:first-child {
+  width: 24px;
+  height: 24px;
+  border-radius: 9999px;
+  background: var(--pf-color-dark);
+  color: var(--pf-color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: var(--pf-font-sans);
+  box-shadow: 0px 1px 1px #00000005, 0px 2px 2px #0000000a;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  transform: scale(1);
+}
+
+.pf-pin--selected > div:first-child {
+  box-shadow: 0px 2px 2px #0000000a, 0px 8px 16px -4px #0000000a,
+              0 0 0 2px var(--pf-color-white), 0 0 0 4px var(--pf-color-dark);
+  transform: scale(1.1);
+}
+
+.pf-pin:hover > div:first-child {
+  transform: scale(1.05);
+}
+
+.pf-pin--selected:hover > div:first-child {
+  transform: scale(1.15);
+}
+
+/* Pin region overlay */
+.pf-pin > div:last-child {
+  position: absolute;
+  border: 1.5px solid rgba(23, 23, 23, 0.35);
+  background: rgba(23, 23, 23, 0.04);
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+/* ===== SIDEBAR ===== */
+.pf-sidebar {
+  position: fixed;
+  top: 64px;
+  right: 0;
+  bottom: 0;
+  width: 360px;
+  background: var(--pf-color-white);
+  box-shadow: 0px 1px 1px #00000005, 0px 8px 16px -4px #0000000a,
+              0px 24px 32px -8px #0000000f, inset 0 0 0 1px var(--pf-color-border);
+  z-index: 99997;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--pf-font-sans);
+  font-size: 14px;
+  letter-spacing: -0.28px;
+  line-height: 20px;
+  overflow: hidden;
+}
+
+.pf-sidebar > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--pf-color-border);
+  flex-shrink: 0;
+}
+
+.pf-sidebar h2 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--pf-color-text-primary);
+  letter-spacing: -0.28px;
+}
+
+.pf-sidebar button[aria-label="Close sidebar"] {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--pf-color-text-muted);
+  padding: 0 4px;
+  line-height: 1;
+  font-family: var(--pf-font-sans);
+}
+
+.pf-sidebar button[aria-label="Close sidebar"]:hover {
+  color: var(--pf-color-text-primary);
+}
+
+/* Sidebar scrollable content */
+.pf-sidebar > div:nth-child(2) {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* New comment form */
+.pf-sidebar form {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--pf-color-border);
+  background: var(--pf-color-bg-subtle);
+}
+
+.pf-sidebar form h3 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--pf-color-text-primary);
+  letter-spacing: -0.28px;
+}
+
+.pf-sidebar input[type="text"],
+.pf-sidebar textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--pf-color-border);
+  border-radius: 6px;
+  font-size: 14px;
+  letter-spacing: -0.28px;
+  box-sizing: border-box;
+  font-family: var(--pf-font-sans);
+  color: var(--pf-color-text-primary);
+  background: var(--pf-color-white);
+  outline: none;
+  line-height: 20px;
+}
+
+.pf-sidebar input[type="text"] {
+  height: 32px;
+  padding: 0 12px;
+  margin-bottom: 8px;
+}
+
+.pf-sidebar input[type="text"]:focus,
+.pf-sidebar textarea:focus {
+  border-color: var(--pf-color-dark);
+}
+
+.pf-sidebar textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+/* Empty state */
+.pf-sidebar p {
+  padding: 24px;
+  color: var(--pf-color-text-muted);
+  text-align: center;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* ===== COMMENT THREAD ===== */
+.pf-thread {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--pf-color-border);
+  font-family: var(--pf-font-sans);
+  font-size: 14px;
+  letter-spacing: -0.28px;
+  line-height: 20px;
+}
+
+.pf-thread > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.pf-thread > div:first-child > span:first-child {
+  background: var(--pf-color-dark);
+  color: var(--pf-color-white);
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.pf-thread > div:first-child > span:nth-child(2) {
+  font-weight: 500;
+  color: var(--pf-color-text-primary);
+}
+
+.pf-thread > div:first-child > span:last-child {
+  color: var(--pf-color-text-muted);
+  font-size: 12px;
+  font-family: var(--pf-font-mono);
+  margin-left: auto;
+}
+
+.pf-thread p {
+  margin: 0 0 8px;
+  color: var(--pf-color-text-secondary);
+  white-space: pre-wrap;
+}
+
+/* Thread action buttons */
+.pf-thread > div:nth-child(3) {
+  display: flex;
+  gap: 12px;
+}
+
+/* Reply section */
+.pf-thread > div:nth-last-child(1),
+.pf-thread > div:nth-last-child(2) {
+  margin-top: 12px;
+  padding-left: 16px;
+  border-left: 1px solid var(--pf-color-border);
+}
+
+/* Individual reply */
+.pf-thread > div:nth-last-child(2) > div {
+  margin-bottom: 12px;
+}
+
+.pf-thread > div:nth-last-child(2) > div > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.pf-thread > div:nth-last-child(2) > div > div:first-child > span:first-child {
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--pf-color-text-primary);
+}
+
+.pf-thread > div:nth-last-child(2) > div > div:first-child > span:last-child {
+  color: var(--pf-color-text-muted);
+  font-size: 11px;
+  font-family: var(--pf-font-mono);
+}
+
+.pf-thread > div:nth-last-child(2) > div > p {
+  margin: 0;
+  color: var(--pf-color-text-secondary);
+  font-size: 13px;
+  white-space: pre-wrap;
+  line-height: 18px;
+}
+
+/* Reply form */
+.pf-thread > div:last-child input[type="text"] {
+  margin-bottom: 8px;
+}
+
+.pf-thread > div:last-child textarea {
+  min-height: 50px;
+}
+
+.pf-thread > div:last-child > div:last-child {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* ===== BUTTONS ===== */
+.pf-sidebar button[type="submit"],
+.pf-thread button[type="button"] {
+  font-family: var(--pf-font-sans);
+  letter-spacing: -0.28px;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.pf-sidebar button[type="submit"]:hover,
+.pf-thread button[type="button"]:hover {
+  opacity: 0.9;
+}
+
+/* Primary button (dark) */
+button[style*="background: #171717"],
+button[style*="background:#171717"] {
+  padding: 0 12px;
+  height: 32px;
+  border-radius: 100px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  background: var(--pf-color-dark);
+  color: var(--pf-color-white);
+  font-family: var(--pf-font-sans);
+  letter-spacing: -0.28px;
+}
+
+/* Secondary button (white) */
+button[style*="background: #ffffff"],
+button[style*="background:#ffffff"] {
+  padding: 0 12px;
+  height: 32px;
+  border-radius: 100px;
+  border: 1px solid var(--pf-color-border);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  background: var(--pf-color-white);
+  color: var(--pf-color-text-primary);
+  font-family: var(--pf-font-sans);
+  letter-spacing: -0.28px;
+}
+
+/* Text link buttons */
+button[style*="background: none"],
+button[style*="background:none"] {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 500;
+  font-family: var(--pf-font-sans);
+  letter-spacing: -0.28px;
+}
+
+/* Form button container */
+.pf-sidebar form > div:last-child {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  justify-content: flex-end;
+}
+
+/* ===== REGION SELECTOR ===== */
+.pf-region-selector {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 100vh;
+  cursor: crosshair;
+  pointer-events: auto;
+  z-index: 99995;
+}
+
+.pf-region-selector-box {
+  position: absolute;
+  border: 1.5px dashed rgba(23, 23, 23, 0.4);
+  background: rgba(23, 23, 23, 0.03);
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+/* ===== UTILITY CLASSES ===== */
+.pf-btn-primary {
+  padding: 0 12px;
+  height: 28px;
+  border-radius: 100px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  background: var(--pf-color-dark);
+  color: var(--pf-color-white);
+  font-family: var(--pf-font-sans);
+  letter-spacing: -0.28px;
+  transition: opacity 0.15s ease;
+}
+
+.pf-btn-primary:hover {
+  opacity: 0.9;
+}
+
+.pf-btn-secondary {
+  padding: 0 12px;
+  height: 28px;
+  border-radius: 100px;
+  border: 1px solid var(--pf-color-border);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  background: var(--pf-color-white);
+  color: var(--pf-color-text-primary);
+  font-family: var(--pf-font-sans);
+  letter-spacing: -0.28px;
+  transition: opacity 0.15s ease;
+}
+
+.pf-btn-secondary:hover {
+  opacity: 0.9;
+}
+
+.pf-btn-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 12px;
+  color: var(--pf-color-text-secondary);
+  cursor: pointer;
+  font-weight: 500;
+  font-family: var(--pf-font-sans);
+  letter-spacing: -0.28px;
+  transition: color 0.15s ease;
+}
+
+.pf-btn-link:hover {
+  color: var(--pf-color-text-primary);
+}
+
+.pf-btn-link-danger {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 12px;
+  color: var(--pf-color-danger);
+  cursor: pointer;
+  font-weight: 500;
+  font-family: var(--pf-font-sans);
+  letter-spacing: -0.28px;
+  transition: opacity 0.15s ease;
+}
+
+.pf-btn-link-danger:hover {
+  opacity: 0.8;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .pf-sidebar {
+    width: 100%;
+    max-width: 360px;
+  }
+}
+
+/* ===== SMOOTH ANIMATIONS ===== */
+@keyframes pf-slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.pf-sidebar {
+  animation: pf-slideIn 0.2s ease-out;
+}
+
+@keyframes pf-fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.pf-pin {
+  animation: pf-fadeIn 0.2s ease-out;
+}
