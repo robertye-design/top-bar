@@ -10,31 +10,31 @@ export function CommentPin({ comment, number, isSelected, onClick }) {
 
   useEffect(() => {
     const updatePosition = () => {
-      if (!comment.position.xPercent || !comment.position.yPercent) {
+      if (!comment.position.xPercent) {
         // Legacy comment without percentage data - use original pixel position
         setPosition(comment.position);
         setRegionDimensions(comment.region);
         return;
       }
 
-      // Calculate position from percentages based on current document size
+      // Calculate X position from percentage based on current document width
+      // Keep Y position absolute (document height doesn't scale with viewport)
       const currentDocWidth = document.documentElement.scrollWidth;
-      const currentDocHeight = document.documentElement.scrollHeight;
 
       const scaledPosition = {
         x: (comment.position.xPercent / 100) * currentDocWidth,
-        y: (comment.position.yPercent / 100) * currentDocHeight
+        y: comment.position.y  // Keep Y absolute - vertical content doesn't scale
       };
 
       setPosition(scaledPosition);
 
-      // Scale region using percentages
-      if (comment.region && comment.region.widthPercent && comment.region.heightPercent) {
+      // Scale region width only, keep height and Y absolute
+      if (comment.region && comment.region.widthPercent) {
         setRegionDimensions({
           x: (comment.position.xPercent / 100) * currentDocWidth,
-          y: (comment.position.yPercent / 100) * currentDocHeight,
+          y: comment.position.y,  // Keep Y absolute
           width: (comment.region.widthPercent / 100) * currentDocWidth,
-          height: (comment.region.heightPercent / 100) * currentDocHeight
+          height: comment.region.height  // Keep height absolute
         });
       } else if (comment.region) {
         // Legacy region without percentages
