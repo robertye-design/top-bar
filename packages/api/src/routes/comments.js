@@ -14,7 +14,7 @@ export function createCommentRoutes(storage) {
 
   router.post('/prototypes/:prototypeId/comments', (req, res) => {
     try {
-      const { type, position, region, authorName, text } = req.body;
+      const { type, position, viewport, region, authorName, text } = req.body;
 
       if (!type || !position || !authorName || !text) {
         return res.status(400).json({ error: 'Missing required fields: type, position, authorName, text' });
@@ -25,7 +25,7 @@ export function createCommentRoutes(storage) {
       }
 
       const comment = storage.addComment(req.params.prototypeId, {
-        type, position, region, authorName, text
+        type, position, viewport, region, authorName, text
       });
       res.status(201).json(comment);
     } catch (err) {

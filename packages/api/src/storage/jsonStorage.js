@@ -56,6 +56,7 @@ export class JsonStorage {
       id: randomUUID(),
       type: data.type,
       position: data.position,
+      viewport: data.viewport || null,
       region: data.region || null,
       authorName: data.authorName,
       text: data.text,

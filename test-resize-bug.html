@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Resize Bug Test</title>
+  <style>
+    body { margin: 0; padding: 60px 20px 20px; font-family: system-ui; }
+    .target-box {
+      width: 200px;
+      height: 150px;
+      background: #4353FF;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 100px auto;
+      border-radius: 8px;
+    }
+    .debug {
+      position: fixed;
+      top: 70px;
+      right: 10px;
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 10px;
+      font-size: 12px;
+      font-family: monospace;
+      z-index: 99999;
+    }
+  </style>
+</head>
+<body>
+  <h1>Resize Bug Test</h1>
+  <p>Instructions:</p>
+  <ol>
+    <li>Click "Add Comment" in the top bar</li>
+    <li>Click on the BLUE BOX below</li>
+    <li>Add a comment</li>
+    <li><strong>Resize the browser window</strong></li>
+    <li>Check if the pin stays on the blue box</li>
+  </ol>
+
+  <div class="target-box">
+    CLICK ME
+  </div>
+
+  <div class="debug">
+    <div>Window Width: <span id="width">-</span></div>
+    <div>Document Width: <span id="docWidth">-</span></div>
+    <div>Scale Factor: <span id="scale">-</span></div>
+  </div>
+
+  <!-- Framework -->
+  <link rel="stylesheet" href="../../dist/style.css">
+  <script src="../../dist/prototype-framework.iife.js"></script>
+  <script>
+    PrototypeFramework.init({
+      prototypeId: 'resize-test',
+      apiUrl: 'https://api-ebon-two-17.vercel.app',
+      topBarTitle: 'Resize Bug Test'
+    });
+
+    // Debug info
+    function updateDebug() {
+      document.getElementById('width').textContent = window.innerWidth;
+      document.getElementById('docWidth').textContent = document.documentElement.scrollWidth;
+
+      // Simulate what the scale factor would be
+      const original = 1440; // Assume original width
+      const current = document.documentElement.scrollWidth;
+      document.getElementById('scale').textContent = (current / original).toFixed(3);
+    }
+
+    updateDebug();
+    window.addEventListener('resize', updateDebug);
+
+    // Log comment data when created
+    setTimeout(() => {
+      const originalFetch = window.fetch;
+      window.fetch = function(...args) {
+        if (args[0].includes('/comments') && args[1]?.method === 'POST') {
+          console.log('Creating comment with data:', JSON.parse(args[1].body));
+        }
+        return originalFetch.apply(this, args);
+      };
+    }, 1000);
+  </script>
+</body>
+</html>

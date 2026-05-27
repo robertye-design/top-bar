@@ -88,6 +88,7 @@ export class CommentsPlugin {
       const data = {
         type: this.newCommentPosition.type,
         position: this.newCommentPosition.position,
+        viewport: this.newCommentPosition.viewport,
         region: this.newCommentPosition.region,
         authorName: formData.authorName,
         text: formData.text
