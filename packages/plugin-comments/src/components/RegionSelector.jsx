@@ -38,14 +38,25 @@ export function RegionSelector({ active, onSelect, onCancel }) {
     const dx = Math.abs(end.x - start.x);
     const dy = Math.abs(end.y - start.y);
 
+    // Store viewport dimensions for resize scaling
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const documentWidth = document.documentElement.scrollWidth;
+
     if (dx < 5 && dy < 5) {
-      onSelect({ type: 'point', position: { x: start.x, y: start.y }, region: null });
+      onSelect({
+        type: 'point',
+        position: { x: start.x, y: start.y },
+        viewport: { width: viewportWidth, height: viewportHeight, documentWidth },
+        region: null
+      });
     } else {
       const x = Math.min(start.x, end.x);
       const y = Math.min(start.y, end.y);
       onSelect({
         type: 'region',
         position: { x, y },
+        viewport: { width: viewportWidth, height: viewportHeight, documentWidth },
         region: { x, y, width: dx, height: dy }
       });
     }

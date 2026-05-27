@@ -1,15 +1,58 @@
 import { h } from 'preact';
+import { useState, useEffect } from 'preact/hooks';
 
 export function CommentPin({ comment, number, isSelected, onClick }) {
   const hasRegion = comment.type === 'region' && comment.region;
+
+  // Calculate scaled position based on viewport changes
+  const [position, setPosition] = useState(comment.position);
+  const [regionDimensions, setRegionDimensions] = useState(comment.region);
+
+  useEffect(() => {
+    const updatePosition = () => {
+      if (!comment.viewport) {
+        // Legacy comment without viewport data - use original position
+        setPosition(comment.position);
+        setRegionDimensions(comment.region);
+        return;
+      }
+
+      // Calculate scale factor based on document width change
+      const currentDocumentWidth = document.documentElement.scrollWidth;
+      const originalDocumentWidth = comment.viewport.documentWidth || comment.viewport.width;
+      const scale = currentDocumentWidth / originalDocumentWidth;
+
+      // Scale the position
+      const scaledPosition = {
+        x: comment.position.x * scale,
+        y: comment.position.y * scale
+      };
+
+      setPosition(scaledPosition);
+
+      // Scale region if it exists
+      if (comment.region) {
+        setRegionDimensions({
+          x: comment.region.x * scale,
+          y: comment.region.y * scale,
+          width: comment.region.width * scale,
+          height: comment.region.height * scale
+        });
+      }
+    };
+
+    updatePosition();
+    window.addEventListener('resize', updatePosition);
+    return () => window.removeEventListener('resize', updatePosition);
+  }, [comment]);
 
   return (
     <div
       className={`pf-pin ${isSelected ? 'pf-pin--selected' : ''}`}
       style={{
         position: 'absolute',
-        left: `${comment.position.x}px`,
-        top: `${comment.position.y}px`,
+        left: `${position.x}px`,
+        top: `${position.y}px`,
         pointerEvents: 'auto',
         zIndex: 99996,
         transform: 'translate(-12px, -12px)',
@@ -38,13 +81,13 @@ export function CommentPin({ comment, number, isSelected, onClick }) {
         {number}
       </div>
 
-      {hasRegion && (
+      {hasRegion && regionDimensions && (
         <div style={{
           position: 'absolute',
           left: '12px',
           top: '12px',
-          width: `${comment.region.width}px`,
-          height: `${comment.region.height}px`,
+          width: `${regionDimensions.width}px`,
+          height: `${regionDimensions.height}px`,
           border: '1.5px solid rgba(23,23,23,0.35)',
           background: 'rgba(23,23,23,0.04)',
           borderRadius: '8px',
